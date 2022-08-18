@@ -1,0 +1,52 @@
+apiVersion: container.cnrm.cloud.google.com/v1beta1
+kind: ContainerCluster
+metadata:
+  name: GKE4_NAME
+  namespace: config-control
+  labels:
+    mesh_id: proj-PROJECT_NUMBER
+spec:
+  location: GKE4_LOCATION
+  initialNodeCount: 3
+  workloadIdentityConfig:
+    workloadPool: PROJECT_ID.svc.id.goog
+  clusterAutoscaling:
+    enabled: true
+    autoscalingProfile: BALANCED
+    resourceLimits:
+      - resourceType: cpu
+        maximum: 100
+        minimum: 10
+      - resourceType: memory
+        maximum: 1000
+        minimum: 100
+  releaseChannel:
+    channel: REGULAR
+  maintenancePolicy:
+    dailyMaintenanceWindow:
+      duration: "4"
+      startTime: "08:00"
+  enableIntranodeVisibility: true
+  nodeConfig:
+    machineType: "e2-standard-4"
+  addonsConfig:
+    networkPolicyConfig:
+      disabled: false
+  networkPolicy:
+    enabled: true
+    provider: CALICO
+  enableBinaryAuthorization: true
+---
+# apiVersion: gkehub.cnrm.cloud.google.com/v1beta1
+# kind: GKEHubMembership
+# metadata:
+#   name: gke4-hub-membership
+#   namespace: config-control
+# spec:
+#   location: global
+#   authority:
+#     issuer: https://container.googleapis.com/v1/projects/PROJECT_ID/locations/GKE4_LOCATION/clusters/GKE4_NAME
+#   endpoint:
+#     gkeCluster:
+#       resourceRef:
+#         name: GKE4_NAME
